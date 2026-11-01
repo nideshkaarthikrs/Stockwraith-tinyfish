@@ -1,8 +1,8 @@
 {
   "seller": "LCSC",
   "seller_type": "authorised",
-  "mpn": "STM32F103C8T6",
-  "stock": 42110,
+  "mpn": null,
+  "stock": 42104,
   "moq": 1,
   "price_breaks": [
     {
@@ -36,11 +36,11 @@
       "unit_price": 0.9595
     }
   ],
-  "lead_time": null,
+  "lead_time": "6-8 business days",
   "package": "LQFP-48(7x7)",
   "temp_range": "-40℃~+85℃",
-  "lifecycle": "Active",
+  "lifecycle": null,
   "url": "https://www.lcsc.com/product-detail/C8734.html?s_z=n_q_x_STM32F103C8T6",
-  "read_at": "2026-11-01T08:19:03.114Z",
+  "read_at": "2026-11-01T08:53:09.425Z",
   "extra_claims": null
 }

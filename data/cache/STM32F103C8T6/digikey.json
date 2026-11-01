@@ -3,7 +3,7 @@
   "seller_type": "authorised",
   "mpn": "STM32F103C8T6",
   "stock": 7061,
-  "moq": 1,
+  "moq": null,
   "price_breaks": [
     {
       "qty": 1,
@@ -41,6 +41,6 @@
   "temp_range": "-40°C ~ 85°C (TA)",
   "lifecycle": "Active",
   "url": "https://www.digikey.in/en/products/detail/stmicroelectronics/STM32F103C8T6/1646338",
-  "read_at": "2026-11-01T08:19:32.546Z",
+  "read_at": "2026-11-01T08:56:20.112Z",
   "extra_claims": null
 }

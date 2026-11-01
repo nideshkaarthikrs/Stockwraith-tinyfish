@@ -36,7 +36,15 @@ function readStock(run: MonitorRun): WatchCheck {
   return { at, inStock: null, evidence: run.judgment?.summary ?? "stock state unclear" };
 }
 
-export async function addWatch(mpn: string, seller: string, url: string): Promise<Watch> {
+// Serialize read-modify-write operations so concurrent checks do not overwrite watches.
+const state = globalThis as unknown as { __watchQueue?: Promise<unknown> };
+function exclusive<T>(action: () => Promise<T>): Promise<T> {
+  const next = (state.__watchQueue ?? Promise.resolve()).then(action, action);
+  state.__watchQueue = next.catch(() => {});
+  return next;
+}
+
+async function addWatchUnlocked(mpn: string, seller: string, url: string): Promise<Watch> {
   const ws = await listWatches();
   const existing = ws.find((w) => w.url === url);
   if (existing) return existing;
@@ -46,25 +54,36 @@ export async function addWatch(mpn: string, seller: string, url: string): Promis
   return w;
 }
 
-export async function checkWatch(id: string, simulate: boolean): Promise<Watch | null> {
+async function checkWatchUnlocked(id: string, simulate: boolean): Promise<Watch | null> {
   const ws = await listWatches();
   const w = ws.find((x) => x.id === id);
   if (!w) return null;
   const check: WatchCheck = simulate
     ? { at: new Date().toISOString(), inStock: true, evidence: "SIMULATED restock for demo", simulated: true }
     : readStock((await runMonitor(id)).run);
-  const prev = w.checks.at(-1);
+  const prev = [...w.checks].reverse().find((c) => c.inStock !== null && !c.simulated);
   w.checks = [...w.checks, check].slice(-10);
   if (check.inStock && prev?.inStock === false) w.alert = check;
   await save(ws);
   return w;
 }
 
-export async function clearAlert(id: string) {
+async function clearAlertUnlocked(id: string) {
   const ws = await listWatches();
   const w = ws.find((x) => x.id === id);
   if (w) {
     w.alert = null;
     await save(ws);
   }
+  return !!w;
+}
+
+export function addWatch(mpn: string, seller: string, url: string) {
+  return exclusive(() => addWatchUnlocked(mpn, seller, url));
+}
+export function checkWatch(id: string, simulate: boolean) {
+  return exclusive(() => checkWatchUnlocked(id, simulate));
+}
+export function clearAlert(id: string) {
+  return exclusive(() => clearAlertUnlocked(id));
 }

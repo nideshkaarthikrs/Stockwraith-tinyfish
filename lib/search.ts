@@ -37,6 +37,7 @@ export interface SearchJob {
   reference: Listing | null;
   verifier: string | null;
   fxNote: string;
+  error?: string;
 }
 
 // Survives Next dev hot reloads.
@@ -56,11 +57,15 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 // Agent results sometimes come wrapped; find the object that carries listing fields.
 function unwrapAgentResult(result: unknown): Record<string, unknown> | null {
   if (!result || typeof result !== "object") return null;
+  if (Array.isArray(result)) {
+    for (const item of result) { const found = unwrapAgentResult(item); if (found) return found; }
+    return null;
+  }
   const r = result as Record<string, unknown>;
   if ("stock" in r || "price_breaks" in r || "mpn" in r) return r;
   for (const v of Object.values(r)) {
     const inner = typeof v === "string" ? safeParse(v) : v;
-    const found = unwrapAgentResult(Array.isArray(inner) ? inner[0] : inner);
+    const found = unwrapAgentResult(inner);
     if (found) return found;
   }
   return null;
@@ -91,18 +96,26 @@ async function runAgentSeller(cfg: SellerConfig, st: SellerState, mpn: string): 
     if (run.status === "COMPLETED") {
       const r = unwrapAgentResult(run.result);
       if (!r) throw new Error("agent finished without listing data");
+      const str = (v: unknown) => typeof v === "string" && v.trim() ? v.trim() : null;
+      const count = (v: unknown) => typeof v === "number" && Number.isSafeInteger(v) && v >= 0 ? v : null;
+      const prices = Array.isArray(r.price_breaks) ? r.price_breaks.filter((p) =>
+        p && typeof p === "object" && Number.isSafeInteger(p.qty) && p.qty > 0 &&
+        typeof p.unit_price === "number" && Number.isFinite(p.unit_price) && p.unit_price >= 0 &&
+        typeof p.currency === "string") : [];
+      let evidenceUrl = url;
+      try { const parsed = new URL(String(r.url)); if (parsed.protocol === "https:" || parsed.protocol === "http:") evidenceUrl = parsed.href; } catch {}
       return {
         seller: cfg.name,
         seller_type: cfg.type,
-        mpn: (r.mpn as string) ?? null,
-        stock: (r.stock as number) ?? null,
-        moq: (r.moq as number) ?? null,
-        price_breaks: Array.isArray(r.price_breaks) ? (r.price_breaks as Listing["price_breaks"]) : [],
-        lead_time: (r.lead_time as string) ?? null,
-        package: (r.package as string) ?? null,
-        temp_range: (r.temp_range as string) ?? null,
-        lifecycle: (r.lifecycle as string) ?? null,
-        url: (r.url as string) || url,
+        mpn: str(r.mpn),
+        stock: count(r.stock),
+        moq: count(r.moq),
+        price_breaks: prices,
+        lead_time: str(r.lead_time),
+        package: str(r.package),
+        temp_range: str(r.temp_range),
+        lifecycle: str(r.lifecycle),
+        url: evidenceUrl,
         read_at: new Date().toISOString(),
         extra_claims: null,
       };
@@ -192,13 +205,14 @@ async function finish(job: SearchJob) {
     withListing.map((s) => ({ listing: s.listing!, source: s.source ?? "live" })),
     job.spec,
     job.reference,
+    !!job.replay,
   );
   job.rows = out.rows;
   job.verifier = out.verifier;
   job.status = "done";
   await writeJson(searchPath(job.id), job);
   // Keep the latest all-live run as the demo replay.
-  if (job.sellers.every((s) => s.source === "live")) await writeJson(demoPath(job.spec.mpn), job);
+  if (!job.replay && job.sellers.every((s) => s.source === "live")) await writeJson(demoPath(job.spec.mpn), job);
 }
 
 export function startSearch(spec: SpecInput): SearchJob {
@@ -220,6 +234,7 @@ export function startSearch(spec: SpecInput): SearchJob {
     .then(() => finish(job))
     .catch((e) => {
       console.error("[search] finish failed", e);
+      job.error = "Verification failed. Please retry the search.";
       job.status = "done";
     });
   return job;
@@ -231,6 +246,10 @@ export async function startReplay(spec: SpecInput): Promise<SearchJob | null> {
   if (!recorded) return null;
   const job: SearchJob = {
     ...recorded,
+    spec,
+    createdAt: new Date().toISOString(),
+    reference: null,
+    verifier: null,
     id: randomUUID(),
     replay: { of: recorded.createdAt },
     sellers: newSellerStates(),
@@ -249,14 +268,15 @@ export async function startReplay(spec: SpecInput): Promise<SearchJob | null> {
     }, total / Math.max(rec.steps, 1));
     setTimeout(() => {
       clearInterval(tick);
-      Object.assign(st, rec, { finishedAt: Date.now() });
+      Object.assign(st, rec, { startedAt: st.startedAt, finishedAt: Date.now(), streamingUrl: null });
     }, total);
   });
   setTimeout(() => {
-    job.rows = recorded.rows;
-    job.reference = recorded.reference;
-    job.verifier = recorded.verifier;
-    job.status = "done";
+    void finish(job).catch((e) => {
+      console.error("[replay] verification failed", e);
+      job.error = "Verification failed. Please retry the search.";
+      job.status = "done";
+    });
   }, 11000);
   return job;
 }

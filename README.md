@@ -30,7 +30,7 @@ Remove TinyFish and the product does not exist.
 ## Run it
 ```bash
 cp .env.example .env.local   # add TINYFISH_API_KEY and GEMINI_API_KEY
-npm install
+npm ci
 npm run dev                  # http://localhost:3000
 ```
 Rehearsal: `FORCE_FAIL=digikey npm run dev` makes a seller fail so you can see the cached fallback.
@@ -48,3 +48,21 @@ lib/search.ts                        parallel orchestration, cache fallback, rep
 lib/extract.ts                       Fetch markdown → listing
 lib/verify.ts                        rules + Gemini + ranking
 ```
+
+## Local verification
+
+Node.js 24 and npm 11 were used on Windows. Development and production builds use Webpack to avoid a Turbopack CSS subprocess crash on this setup. Tailwind uses the PostCSS integration.
+
+```bash
+npm test             # rules, mocked TinyFish orchestration and watch lifecycle
+npm run lint
+npm run build
+npm start            # production app at http://localhost:3000
+npm run test:e2e     # starts an isolated production test server on port 3100
+```
+
+Browser tests use installed Microsoft Edge. The browser suite starts a test server on port 3100 with API keys explicitly blank and sellers forced to fail: it deliberately tests fallback and monitor failures without spending credits, even when local keys are configured. It temporarily seeds and restores `data/watch.json`; do not use Stock Watch concurrently with these tests. Tests never use paid API services. Replay re-verifies recorded listings against the submitted spec using offline rules, preserving the original evidence timestamps.
+
+For real seller searches and monitors, set `TINYFISH_API_KEY` in `.env.local` and restart the server. `GEMINI_API_KEY` is optional; deterministic rules work without it. No keys are committed.
+
+See [QA_REPORT.md](QA_REPORT.md) for fixes, coverage and remaining limitations.

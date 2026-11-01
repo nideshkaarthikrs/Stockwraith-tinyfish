@@ -37,7 +37,7 @@ export function extractFromMarkdown(
   const flash = (opts.title ?? "") + "\n" + main;
   const flashClaim = flash.match(/(\d+)\s*Kbytes? (?:of )?Flash/i)?.[1];
 
-  const mpnOnPage = main.toUpperCase().includes(opts.mpn.toUpperCase()) ? opts.mpn.toUpperCase() : null;
+  const mpnOnPage = main.toUpperCase().split(/[^A-Z0-9._+/-]+/).includes(opts.mpn.toUpperCase()) ? opts.mpn.toUpperCase() : null;
 
   return {
     seller: opts.seller,

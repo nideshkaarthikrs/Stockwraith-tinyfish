@@ -11,8 +11,9 @@ export default function Home() {
   const [form, setForm] = useState(DEFAULT);
   const [replay, setReplay] = useState(false);
   const [job, setJob] = useState<SearchJob | null>(null);
+  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [now, setNow] = useState(() => Date.now());
+  const [now, setNow] = useState(0);
   const poll = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
@@ -20,9 +21,13 @@ export default function Home() {
     return () => clearInterval(t);
   }, []);
 
+  useEffect(() => () => { if (poll.current) clearInterval(poll.current); }, []);
+
   async function run(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    setSubmitting(true);
+    try {
     setJob(null);
     if (poll.current) clearInterval(poll.current);
     const res = await fetch("/api/search", {
@@ -33,17 +38,27 @@ export default function Home() {
     const data = await res.json();
     if (!res.ok) return setError(data.error ?? "search failed");
     const tick = async () => {
+      try {
       const r = await fetch(`/api/search/${data.id}`, { cache: "no-store" });
-      if (!r.ok) return;
+      if (!r.ok) throw new Error("Could not load search results. Please retry.");
       const j = (await r.json()) as SearchJob;
       setJob(j);
+      if (j.error) setError(j.error);
       if (j.status === "done" && poll.current) clearInterval(poll.current);
+      } catch (e) {
+        if (poll.current) clearInterval(poll.current);
+        setJob(null);
+        setError(e instanceof Error ? e.message : "Could not load results");
+      }
     };
-    tick();
     poll.current = setInterval(tick, 2000);
+    await tick();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Search request failed");
+    } finally { setSubmitting(false); }
   }
 
-  const busy = job !== null && job.status !== "done";
+  const busy = submitting || (job !== null && job.status !== "done");
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-8 sm:px-8">
@@ -136,7 +151,7 @@ const STATUS_STYLE: Record<SellerState["status"], string> = {
 };
 
 function SellerCard({ s, now }: { s: SellerState; now: number }) {
-  const secs = Math.round(((s.finishedAt ?? now) - s.startedAt) / 1000);
+  const secs = Math.max(0, Math.round(((s.finishedAt ?? now) - s.startedAt) / 1000));
   return (
     <div className="card p-4">
       <div className="mb-1 flex items-center justify-between">
@@ -170,6 +185,7 @@ const VERDICT: Record<VerifiedListing["verdict"], { label: string; cls: string }
 const fmt = (n: number | null | undefined) => (n === null || n === undefined ? "—" : n.toLocaleString("en-IN"));
 
 function ResultsTable({ rows, qty }: { rows: VerifiedListing[]; qty: number }) {
+  if (!rows.length) return <p className="p-4 text-slate-400">No seller listings were available. Check the seller errors and try again.</p>;
   return (
     <div className="overflow-x-auto">
       <table className="w-full min-w-[1000px] text-left text-sm">

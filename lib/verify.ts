@@ -15,7 +15,7 @@ export function pkgKey(s: string): string {
 
 // "-40 to +85 °C", "-40°C ~ 85°C" → [-40, 85]
 export function tempPair(s: string): [number, number] | null {
-  const n = s.replace(/[–—]/g, "-").match(/[-+]?\d+(?:\.\d+)?/g);
+  const n = s.replace(/[–—−]/g, "-").match(/[-+]?\d+(?:\.\d+)?/g);
   return n && n.length >= 2 ? [Number(n[0]), Number(n[1])] : null;
 }
 
@@ -23,6 +23,7 @@ export function unitPriceInr(l: Listing, qty: number): number | null {
   if (!l.price_breaks?.length) return null;
   const sorted = [...l.price_breaks].sort((a, b) => a.qty - b.qty);
   const pb = [...sorted].reverse().find((p) => p.qty <= qty) ?? sorted[0];
+  if (pb.qty > qty) return null;
   return toInr(pb.unit_price, pb.currency);
 }
 
@@ -60,10 +61,11 @@ export function ruleCheck(l: Listing, spec: SpecInput, ref: Listing | null): Rul
   else if (l.stock < spec.qty) flag("amber", `only ${l.stock.toLocaleString()} in stock, need ${spec.qty}`);
 
   const minBreak = l.price_breaks?.length ? Math.min(...l.price_breaks.map((p) => p.qty)) : null;
+  if (l.moq && l.moq > spec.qty) flag("amber", `MOQ ${l.moq} exceeds required quantity ${spec.qty}`);
   if (l.moq && minBreak !== null && l.moq > minBreak)
     flag("amber", `MOQ ${l.moq} but a qty-${minBreak} price is listed (mixed packaging?)`);
 
-  if (l.lifecycle && !/active/i.test(l.lifecycle)) flag("amber", `lifecycle: ${l.lifecycle}`);
+  if (l.lifecycle && !/^active$/i.test(l.lifecycle.trim())) flag("amber", `lifecycle: ${l.lifecycle}`);
 
   // Most severe finding first, so it becomes the one-line reason when the LLM is unavailable.
   const reasons = found.sort((a, b) => ORDER[b.v] - ORDER[a.v]).map((f) => f.r);
@@ -130,7 +132,10 @@ and ONE short plain-English reason (max 14 words). Never pick a verdict better t
       }
       const data = await res.json();
       const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-      return JSON.parse(text) as LlmVerdict[];
+      const parsed: unknown = JSON.parse(text);
+      if (!Array.isArray(parsed)) continue;
+      return parsed.filter((v): v is LlmVerdict => !!v && typeof v.seller === "string" &&
+        ["green", "amber", "red"].includes(v.verdict) && typeof v.reason === "string");
     } catch (e) {
       console.warn(`[verify] ${model} failed`, e);
     }
@@ -147,16 +152,17 @@ export async function verifyAll(
   items: { listing: Listing; source: "live" | "cached" }[],
   spec: SpecInput,
   ref: Listing | null,
+  offline = false,
 ): Promise<VerifyOutput> {
   const listings = items.map((i) => i.listing);
   const rules = listings.map((l) => ruleCheck(l, spec, ref));
-  const llm = await llmReview(listings, spec, ref, rules);
+  const llm = offline ? null : await llmReview(listings, spec, ref, rules);
 
   const rows: VerifiedListing[] = items.map(({ listing, source }, i) => {
     const r = rules[i];
     const ai = llm?.find((v) => v.seller === listing.seller);
     const verdict = ai ? worse(r.verdict, ai.verdict) : r.verdict;
-    const reason = ai?.reason || r.reasons[0] || "matches required spec";
+    const reason = (ai && ORDER[ai.verdict] >= ORDER[r.verdict] ? ai.reason : null) || r.reasons[0] || "matches required spec";
     return { ...listing, source, verdict, reason, unit_price_inr: unitPriceInr(listing, spec.qty), rank: 0 };
   });
 

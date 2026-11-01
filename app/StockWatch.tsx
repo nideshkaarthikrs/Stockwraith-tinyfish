@@ -10,18 +10,30 @@ export default function StockWatch() {
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const load = () => fetch("/api/watch", { cache: "no-store" }).then((r) => r.json()).then(setWatches);
+  const load = async () => {
+    const r = await fetch("/api/watch", { cache: "no-store" });
+    if (!r.ok) throw new Error("Could not load watches");
+    setWatches(await r.json());
+  };
   useEffect(() => {
-    load();
+    let active = true;
+    fetch("/api/watch", { cache: "no-store" })
+      .then((r) => { if (!r.ok) throw new Error("Could not load watches"); return r.json(); })
+      .then((ws) => { if (active) setWatches(ws); })
+      .catch((e) => { if (active) setError(e.message); });
+    return () => { active = false; };
   }, []);
 
   async function act(label: string, fn: () => Promise<Response>) {
     setBusy(label);
     setError(null);
+    try {
     const res = await fn();
     if (!res.ok) setError((await res.json()).error ?? "failed");
     await load();
-    setBusy(null);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Watch request failed");
+    } finally { setBusy(null); }
   }
 
   const create = () =>
