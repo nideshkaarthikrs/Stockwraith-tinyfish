@@ -45,9 +45,11 @@ next-env.d.ts
 /data/searches/
 /data/watch.json
 
-# planning notes, agent instructions and pitch material (local only)
+# planning notes, agent instructions, demo/testing guides and pitch material (local only)
 PLAN.md
 AGENTS.md
+DEMO.md
+MANUAL_TESTING.md
 CLAUDE.md
 *.pdf
 *.pptx
