@@ -1,7 +1,7 @@
 {
   "seller": "DigiKey India",
   "seller_type": "authorised",
-  "mpn": null,
+  "mpn": "STM32F103C8T6",
   "stock": 7061,
   "moq": 1,
   "price_breaks": [
@@ -36,11 +36,11 @@
       "unit_price": 474.97364
     }
   ],
-  "lead_time": null,
+  "lead_time": "40 Weeks",
   "package": "48-LQFP",
-  "temp_range": "-40 C ~ 85 C TA",
+  "temp_range": "-40°C ~ 85°C (TA)",
   "lifecycle": "Active",
   "url": "https://www.digikey.in/en/products/detail/stmicroelectronics/STM32F103C8T6/1646338",
-  "read_at": "2026-11-01T08:16:58.221Z",
+  "read_at": "2026-11-01T08:19:32.546Z",
   "extra_claims": null
 }

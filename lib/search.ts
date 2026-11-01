@@ -140,6 +140,8 @@ async function runSeller(cfg: SellerConfig, st: SellerState, mpn: string) {
   st.status = "running";
   st.startedAt = Date.now();
   try {
+    // Rehearsal switch: FORCE_FAIL=digikey,lcsc makes those sellers fail so the cached fallback shows.
+    if (process.env.FORCE_FAIL?.split(",").includes(cfg.id)) throw new Error("forced failure (rehearsal)");
     const listing = cfg.mode === "agent" ? await runAgentSeller(cfg, st, mpn) : await runFetchSeller(cfg, st, mpn);
     st.listing = listing;
     st.source = "live";
