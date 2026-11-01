@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { ruleCheck, tempPair, unitPriceInr, verifyAll } from "../lib/verify";
 import { extractFromMarkdown } from "../lib/extract";
+import { parseQty } from "../lib/quantity";
 import type { Listing } from "../lib/schema";
 const spec = {mpn:"STM32F103C8T6", package:"LQFP-48", temp_range:"-40 to +85 °C", qty:500};
 const listing: Listing = JSON.parse(readFileSync("tests/fixtures/lcsc.json", "utf8"));
@@ -39,4 +40,18 @@ test("Gemini cannot relax rules or attach a contradictory green reason", async (
   globalThis.fetch=async()=>Response.json({candidates:[{content:{parts:[{text:"{}"}]}}]});
   assert.equal((await verifyAll([{listing,source:"live"}],spec,null)).rows[0].verdict,"green");
  }finally{globalThis.fetch=original;if(key===undefined)delete process.env.GEMINI_API_KEY;else process.env.GEMINI_API_KEY=key;}
+});
+test("temperature ranges must be exactly two Celsius values", () => {
+ for(const s of ["-40 to +85 °F","-40 to +85 ºF","-40℉ ~ 85℉","-40 to 85 Fahrenheit","-40F to 85F","233 to 358 K","-40 to 85 to 125 °C","85"])
+  assert.equal(tempPair(s),null,s);
+ for(const s of ["-40 to +85 °C","-40°C ~ 85°C (TA)","-40℃~+85℃","-40 to 85","−40 to +85 °C"])
+  assert.deepEqual(tempPair(s),[-40,85],s);
+ const r=ruleCheck({...listing,temp_range:"-40 to 185 °F"},spec,null);
+ assert.equal(r.verdict,"amber"); assert.match(r.reasons.join(),/temperature range unclear: -40 to 185 °F/);
+});
+test("quantity accepts plain and grouped numbers only", () => {
+ for(const [s,n] of [["500",500],[" 2,500 ",2500],["50,000",50000],["1,00,000",100000],["1,000,000",1000000]] as const)
+  assert.equal(parseQty(s),n,s);
+ for(const s of ["1,2,3","1e3","0x10","1.5","abc","","0","-1","2,50","9007199254740992"])
+  assert.equal(parseQty(s),null,s);
 });

@@ -156,6 +156,9 @@ async function runSeller(cfg: SellerConfig, st: SellerState, mpn: string) {
     // Rehearsal switch: FORCE_FAIL=digikey,lcsc makes those sellers fail so the cached fallback shows.
     if (process.env.FORCE_FAIL?.split(",").includes(cfg.id)) throw new Error("forced failure (rehearsal)");
     const listing = cfg.mode === "agent" ? await runAgentSeller(cfg, st, mpn) : await runFetchSeller(cfg, st, mpn);
+    // A read with nothing usable (e.g. a search page or contact page) means the part was not found.
+    if (!listing.mpn && listing.stock === null && !listing.price_breaks.length && !listing.package && !listing.temp_range)
+      throw new Error("part not found on page");
     st.listing = listing;
     st.source = "live";
     st.status = "done";

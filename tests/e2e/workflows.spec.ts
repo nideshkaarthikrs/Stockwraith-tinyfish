@@ -22,11 +22,16 @@ test("formatted quantity and tablet layout",async({page})=>{
   await page.setViewportSize({width,height:768});
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBeTruthy();
  }
- await page.getByRole("checkbox").check(); await page.getByRole("button",{name:"Hunt stock",exact:true}).click();
+ await page.getByRole("checkbox").check();
+ const searches:string[]=[]; page.on("request",r=>{if(r.url().endsWith("/api/search")&&r.method()==="POST")searches.push(r.url());});
+ await qty.fill("1,2,3"); await page.getByRole("button",{name:"Hunt stock",exact:true}).click();
+ await expect(page.getByText(/quantity must be a positive whole number/)).toBeVisible(); expect(searches).toEqual([]);
+ await qty.fill("2,500"); await page.getByRole("button",{name:"Hunt stock",exact:true}).click();
  await expect(page.getByRole("heading",{name:/Verified results/})).toContainText("qty 2500");
 });
 test("API validation and missing records",async({request})=>{
- for(const body of [null,[],{}, {...spec,qty:-1},{...spec,qty:0},{...spec,qty:1.5},{...spec,replay:"false"}])
+ for(const body of [null,[],{}, {...spec,qty:-1},{...spec,qty:0},{...spec,qty:1.5},{...spec,qty:"16"},{...spec,qty:"0x10"},{...spec,replay:"false"},
+  {...spec,temp_range:"-40 to +85 °F",replay:true},{...spec,temp_range:"-40 to 85 to 125 °C",replay:true}])
   expect((await request.post("/api/search",{data:body})).status()).toBe(400);
  expect((await request.post("/api/search",{data:"{",headers:{"Content-Type":"application/json"}})).status()).toBe(400);
  expect((await request.post("/api/search",{data:{...spec,mpn:"UNKNOWN",replay:true}})).status()).toBe(404);

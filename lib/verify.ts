@@ -13,10 +13,13 @@ export function pkgKey(s: string): string {
   return fam + pins;
 }
 
-// "-40 to +85 °C", "-40°C ~ 85°C" → [-40, 85]
+// "-40 to +85 °C", "-40°C ~ 85°C" → [-40, 85]. Celsius only, exactly two values; anything else is null.
+const NON_CELSIUS = /[°º]\s*[FK]\b|℉|\bdeg(?:rees?)?\s*[FK]\b|fahrenheit|kelvin|\d\s*[FK]\b/i;
+
 export function tempPair(s: string): [number, number] | null {
+  if (NON_CELSIUS.test(s)) return null;
   const n = s.replace(/[–—−]/g, "-").match(/[-+]?\d+(?:\.\d+)?/g);
-  return n && n.length >= 2 ? [Number(n[0]), Number(n[1])] : null;
+  return n && n.length === 2 ? [Number(n[0]), Number(n[1])] : null;
 }
 
 export function unitPriceInr(l: Listing, qty: number): number | null {
@@ -49,7 +52,8 @@ export function ruleCheck(l: Listing, spec: SpecInput, ref: Listing | null): Rul
 
   const want = tempPair(spec.temp_range);
   const got = l.temp_range ? tempPair(l.temp_range) : null;
-  if (!got) flag("amber", "temperature range not stated");
+  if (!l.temp_range) flag("amber", "temperature range not stated");
+  else if (!got) flag("amber", `temperature range unclear: ${l.temp_range}`);
   else if (want && (got[0] !== want[0] || got[1] !== want[1]))
     flag("red", `page claims ${l.temp_range}, required ${spec.temp_range}`);
 

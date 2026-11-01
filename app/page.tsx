@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { SearchJob, SellerState } from "@/lib/search";
 import type { VerifiedListing } from "@/lib/schema";
+import { parseQty } from "@/lib/quantity";
 import StockWatch from "./StockWatch";
 
 // qty stays as typed text; it is parsed on submit so "2,500" or a cleared field is not reset mid-typing.
@@ -27,6 +28,8 @@ export default function Home() {
   async function run(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    const qty = parseQty(form.qty);
+    if (qty === null) return setError("quantity must be a positive whole number, e.g. 500 or 2,500");
     setSubmitting(true);
     try {
     setJob(null);
@@ -34,7 +37,7 @@ export default function Home() {
     const res = await fetch("/api/search", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...form, qty: Number(form.qty.replace(/[,_\s]/g, "")), replay }),
+      body: JSON.stringify({ ...form, qty, replay }),
     });
     const data = await res.json();
     if (!res.ok) return setError(data.error ?? "search failed");
