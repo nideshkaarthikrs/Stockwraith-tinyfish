@@ -34,10 +34,10 @@ interface RuleResult {
 // Plain-code checks. Deterministic, run on every listing.
 export function ruleCheck(l: Listing, spec: SpecInput, ref: Listing | null): RuleResult {
   let verdict: Verdict = "green";
-  const reasons: string[] = [];
+  const found: { v: Verdict; r: string }[] = [];
   const flag = (v: Verdict, r: string) => {
     verdict = worse(verdict, v);
-    reasons.push(r);
+    found.push({ v, r });
   };
 
   if (!l.mpn) flag("amber", "part number not confirmed on page");
@@ -65,6 +65,8 @@ export function ruleCheck(l: Listing, spec: SpecInput, ref: Listing | null): Rul
 
   if (l.lifecycle && !/active/i.test(l.lifecycle)) flag("amber", `lifecycle: ${l.lifecycle}`);
 
+  // Most severe finding first, so it becomes the one-line reason when the LLM is unavailable.
+  const reasons = found.sort((a, b) => ORDER[b.v] - ORDER[a.v]).map((f) => f.r);
   return { verdict, reasons };
 }
 
