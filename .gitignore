@@ -43,3 +43,15 @@ next-env.d.ts
 # runtime data (demo + cache are committed for offline replay)
 /data/searches/
 /data/watch.json
+
+# planning notes, agent instructions and pitch material (local only)
+PLAN.md
+AGENTS.md
+CLAUDE.md
+*.pdf
+*.pptx
+
+# editor / tool folders
+.claude/
+.vscode/
+.idea/
