@@ -5,7 +5,8 @@ import type { SearchJob, SellerState } from "@/lib/search";
 import type { VerifiedListing } from "@/lib/schema";
 import StockWatch from "./StockWatch";
 
-const DEFAULT = { mpn: "STM32F103C8T6", package: "LQFP-48", temp_range: "-40 to +85 °C", qty: 500 };
+// qty stays as typed text; it is parsed on submit so "2,500" or a cleared field is not reset mid-typing.
+const DEFAULT = { mpn: "STM32F103C8T6", package: "LQFP-48", temp_range: "-40 to +85 °C", qty: "500" };
 
 export default function Home() {
   const [form, setForm] = useState(DEFAULT);
@@ -33,7 +34,7 @@ export default function Home() {
     const res = await fetch("/api/search", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...form, replay }),
+      body: JSON.stringify({ ...form, qty: Number(form.qty.replace(/[,_\s]/g, "")), replay }),
     });
     const data = await res.json();
     if (!res.ok) return setError(data.error ?? "search failed");
@@ -80,7 +81,7 @@ export default function Home() {
         <Field label="Part number (MPN)" value={form.mpn} onChange={(v) => setForm({ ...form, mpn: v })} className="col-span-2 md:col-span-1" />
         <Field label="Package" value={form.package} onChange={(v) => setForm({ ...form, package: v })} />
         <Field label="Temperature range" value={form.temp_range} onChange={(v) => setForm({ ...form, temp_range: v })} />
-        <Field label="Quantity" value={String(form.qty)} onChange={(v) => setForm({ ...form, qty: Number(v) || 0 })} />
+        <Field label="Quantity" value={form.qty} onChange={(v) => setForm({ ...form, qty: v })} />
         <div className="col-span-2 flex items-center gap-3 md:col-span-1">
           <button disabled={busy} className="rounded-lg bg-teal-300 px-5 py-2.5 font-semibold text-slate-950 hover:bg-teal-200 disabled:opacity-50">
             {busy ? "Hunting…" : "Hunt stock"}
@@ -131,12 +132,12 @@ export default function Home() {
 
 function Field(p: { label: string; value: string; onChange: (v: string) => void; className?: string }) {
   return (
-    <label className={`flex flex-col gap-1 text-xs text-slate-400 ${p.className ?? ""}`}>
+    <label className={`flex min-w-0 flex-col gap-1 text-xs text-slate-400 ${p.className ?? ""}`}>
       {p.label}
       <input
         value={p.value}
         onChange={(e) => p.onChange(e.target.value)}
-        className="rounded-lg border border-slate-700 bg-slate-950/60 px-3 py-2 font-mono text-base text-slate-100 outline-none focus:border-teal-300"
+        className="w-full min-w-0 rounded-lg border border-slate-700 bg-slate-950/60 px-3 py-2 font-mono text-base text-slate-100 outline-none focus:border-teal-300"
       />
     </label>
   );

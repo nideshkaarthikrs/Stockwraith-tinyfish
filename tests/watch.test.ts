@@ -28,6 +28,10 @@ test("watch creation, duplicate requests, checks, unknown stock, restock, simula
   assert.equal((await checkWatch(a.id,true))?.alert?.simulated,true);
   await clearAlert(a.id);
   assert.equal((await checkWatch(a.id,true))?.alert?.simulated,true);
+  for(let i=0;i<12;i++){await clearAlert(a.id);await checkWatch(a.id,true);}
+  await clearAlert(a.id);
+  page="In Stock";const real=await checkWatch(a.id,false);
+  assert.equal(real?.alert?.simulated,undefined);assert.equal(real?.alert?.inStock,true);
   assert.equal(await checkWatch("unknown",false),null);
   assert.equal(await clearAlert("unknown"),false);
  }finally{

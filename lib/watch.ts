@@ -63,6 +63,8 @@ async function checkWatchUnlocked(id: string, simulate: boolean): Promise<Watch 
     : readStock((await runMonitor(id)).run);
   const prev = [...w.checks].reverse().find((c) => c.inStock !== null && !c.simulated);
   w.checks = [...w.checks, check].slice(-10);
+  // Keep the last real reading so repeated demo simulations cannot push out the restock baseline.
+  if (prev && !w.checks.includes(prev)) w.checks.unshift(prev);
   if (check.inStock && prev?.inStock === false) w.alert = check;
   await save(ws);
   return w;

@@ -14,6 +14,17 @@ test("replay end to end, updated spec, mobile layout",async({page})=>{
  await page.screenshot({path:"test-results/mobile.png",fullPage:true});
  expect(errors).toEqual([]);
 });
+test("formatted quantity and tablet layout",async({page})=>{
+ await page.setViewportSize({width:1024,height:768}); await page.goto("/");
+ const qty=page.getByLabel("Quantity",{exact:true}); await qty.fill(""); await expect(qty).toHaveValue("");
+ await qty.pressSequentially("2,500"); await expect(qty).toHaveValue("2,500");
+ for(const width of [768,900,1024]){
+  await page.setViewportSize({width,height:768});
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBeTruthy();
+ }
+ await page.getByRole("checkbox").check(); await page.getByRole("button",{name:"Hunt stock",exact:true}).click();
+ await expect(page.getByRole("heading",{name:/Verified results/})).toContainText("qty 2500");
+});
 test("API validation and missing records",async({request})=>{
  for(const body of [null,[],{}, {...spec,qty:-1},{...spec,qty:0},{...spec,qty:1.5},{...spec,replay:"false"}])
   expect((await request.post("/api/search",{data:body})).status()).toBe(400);
