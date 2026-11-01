@@ -5,7 +5,7 @@ import { ruleCheck, tempPair, unitPriceInr, verifyAll } from "../lib/verify";
 import { extractFromMarkdown } from "../lib/extract";
 import type { Listing } from "../lib/schema";
 const spec = {mpn:"STM32F103C8T6", package:"LQFP-48", temp_range:"-40 to +85 °C", qty:500};
-const listing: Listing = JSON.parse(readFileSync("data/cache/STM32F103C8T6/lcsc.json", "utf8"));
+const listing: Listing = JSON.parse(readFileSync("tests/fixtures/lcsc.json", "utf8"));
 test("exact seller and mismatched package/MPN", () => {
  assert.equal(ruleCheck(listing,spec,null).verdict,"green");
  assert.equal(ruleCheck({...listing,mpn:spec.mpn+"X"},spec,null).verdict,"red");
