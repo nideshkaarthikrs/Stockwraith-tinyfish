@@ -1,36 +1,50 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Stockwraith
 
-## Getting Started
+**Finds the supply chain's hidden inventory, with proof.**
+Built for *Swim with TinyFish* (Scaler School of Technology) by Team Moorthi Annan Gang.
 
-First, run the development server:
+Type an electronic part number and your required specs. TinyFish web agents read seller pages live, in parallel. Every listing is checked against the manufacturer's own spec, and you get a ranked table where every number links to the page it came from.
 
+> Octopart shows you what distributors report. Stockwraith reads the live page and checks it against your spec.
+
+## How TinyFish powers it
+| TinyFish product | Used for |
+|---|---|
+| **Web Agent** (`run-async` + polling) | LCSC and DigiKey India. The agent searches the site, opens the exact product page and returns stock, MOQ, price breaks, package, temperature range and lifecycle as JSON (`output_schema`). Each agent step is shown live in the UI. |
+| **Fetch** | DNA Techindia (an Indian seller Octopart doesn't list) and the ST eStore. The ST eStore is the manufacturer store and also serves as the **reference spec**. |
+| **Search** | Finds a seller's product page when we don't already know its URL. |
+| **Monitor** | Stock Watch. A page monitor on the sold-out ST eStore page, with a "Check now" button that triggers an immediate run. |
+
+Remove TinyFish and the product does not exist.
+
+## Verification
+1. **Code rules (deterministic):** exact MPN including suffix, package family and pin count, temperature range, stock vs. quantity needed, MOQ vs. price-break consistency, lifecycle, and conflicting claims vs. the manufacturer (for example Flash size).
+2. **One Gemini call per search** (`gemini-3.8-flash`, falling back to `gemini-3.5-flash-lite`, then rules only). It writes the one-line reason and can only make a verdict stricter, never more lenient.
+3. Result: 🟢 exact match · 🟠 needs a check · 🔴 mismatch. Prices are converted to INR at a fixed rate shown in the UI. Unknown fields stay unknown and are never guessed.
+
+## Reliability
+- All sellers run in parallel, each with its own timeout (LCSC 4 min, DigiKey 5 min, Fetch 45 s).
+- If a seller fails live, its last successful read is shown, clearly labelled **cached**.
+- Every fully live run is recorded to `data/demo/<MPN>.json`. The **Replay** switch plays it back offline.
+
+## Run it
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cp .env.example .env.local   # add TINYFISH_API_KEY and GEMINI_API_KEY
+npm install
+npm run dev                  # http://localhost:3000
 ```
+Rehearsal: `FORCE_FAIL=digikey npm run dev` makes a seller fail so you can see the cached fallback.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Stack
+Next.js 16 (TypeScript, App Router, Tailwind) as one app for the UI and API routes · TinyFish REST API · Gemini API (free tier) · JSON files for storage (no native modules, nothing to break on demo day). Runs locally.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Layout
+```
+app/page.tsx, app/StockWatch.tsx     UI
+app/api/search, app/api/watch        API routes
+lib/tinyfish.ts                      TinyFish client (agent, fetch, search, monitor)
+lib/sellers.ts                       seller configs + agent goal
+lib/search.ts                        parallel orchestration, cache fallback, replay
+lib/extract.ts                       Fetch markdown → listing
+lib/verify.ts                        rules + Gemini + ranking
+```
