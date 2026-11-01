@@ -44,9 +44,9 @@ export interface SpecInput {
 export const LISTING_OUTPUT_SCHEMA = {
   type: "object",
   properties: {
-    mpn: { type: ["string", "null"] },
-    stock: { type: ["number", "null"] },
-    moq: { type: ["number", "null"] },
+    mpn: { type: "string", nullable: true },
+    stock: { type: "number", nullable: true },
+    moq: { type: "number", nullable: true },
     price_breaks: {
       type: "array",
       items: {
@@ -59,11 +59,11 @@ export const LISTING_OUTPUT_SCHEMA = {
         required: ["qty", "unit_price", "currency"],
       },
     },
-    lead_time: { type: ["string", "null"] },
-    package: { type: ["string", "null"] },
-    temp_range: { type: ["string", "null"] },
-    lifecycle: { type: ["string", "null"] },
-    url: { type: ["string", "null"] },
+    lead_time: { type: "string", nullable: true },
+    package: { type: "string", nullable: true },
+    temp_range: { type: "string", nullable: true },
+    lifecycle: { type: "string", nullable: true },
+    url: { type: "string", nullable: true },
   },
   required: ["mpn", "stock", "price_breaks", "package", "temp_range", "url"],
 } as const;

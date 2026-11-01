@@ -84,9 +84,10 @@ async function runAgentSeller(cfg: SellerConfig, st: SellerState, mpn: string): 
     await sleep(4000);
     const run = await getRun(runId).catch(() => null);
     if (!run) continue;
-    st.steps = run.num_of_steps ?? st.steps;
+    st.steps = run.num_of_steps ?? run.steps?.length ?? st.steps;
     st.streamingUrl = run.streaming_url ?? st.streamingUrl;
-    st.note = run.status === "PENDING" ? "waiting for browser" : `browsing · step ${st.steps}`;
+    const action = run.steps?.at(-1)?.action;
+    st.note = run.status === "PENDING" ? "waiting for browser" : action ?? "opening site";
     if (run.status === "COMPLETED") {
       const r = unwrapAgentResult(run.result);
       if (!r) throw new Error("agent finished without listing data");

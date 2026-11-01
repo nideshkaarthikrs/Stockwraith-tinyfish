@@ -1,0 +1,15 @@
+{
+  "seller": "ST eStore",
+  "seller_type": "manufacturer_store",
+  "mpn": "STM32F103C8T6",
+  "stock": 0,
+  "moq": null,
+  "price_breaks": [],
+  "lead_time": null,
+  "package": "LQFP 48 7x7x1.4 mm",
+  "temp_range": "-40 to +85 °C",
+  "lifecycle": "Active",
+  "url": "https://estore.st.com/en/stm32f103c8t6-cpn.html",
+  "read_at": "2026-11-01T08:15:12.320Z",
+  "extra_claims": "64 KB Flash"
+}

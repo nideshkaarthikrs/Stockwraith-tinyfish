@@ -1,0 +1,365 @@
+{
+  "id": "c5d96e11-f5f8-4242-b4d5-1f343af0cc8d",
+  "spec": {
+    "mpn": "STM32F103C8T6",
+    "package": "LQFP-48",
+    "temp_range": "-40 to +85 °C",
+    "qty": 500
+  },
+  "createdAt": "2026-11-01T08:15:09.587Z",
+  "replay": null,
+  "sellers": [
+    {
+      "id": "lcsc",
+      "name": "LCSC",
+      "mode": "agent",
+      "isReference": false,
+      "status": "done",
+      "steps": 4,
+      "note": "done in 4 steps",
+      "startedAt": 1793520909587,
+      "finishedAt": 1793520980503,
+      "runId": "b19adc08-8d8d-4a85-8c7b-ecc7593a30e1",
+      "streamingUrl": "https://ip-52-53-255-115.tetra-data.production.tinyfish.io/tf-be43deb6-5bc5-4254-b36a-039795db2a72/stream/0",
+      "listing": {
+        "seller": "LCSC",
+        "seller_type": "authorised",
+        "mpn": null,
+        "stock": 42120,
+        "moq": 1,
+        "price_breaks": [
+          {
+            "qty": 1,
+            "currency": "USD",
+            "unit_price": 1.5087
+          },
+          {
+            "qty": 10,
+            "currency": "USD",
+            "unit_price": 1.3102
+          },
+          {
+            "qty": 30,
+            "currency": "USD",
+            "unit_price": 1.1696
+          },
+          {
+            "qty": 250,
+            "currency": "USD",
+            "unit_price": 1.0422
+          },
+          {
+            "qty": 500,
+            "currency": "USD",
+            "unit_price": 0.9826
+          },
+          {
+            "qty": 1000,
+            "currency": "USD",
+            "unit_price": 0.9595
+          }
+        ],
+        "lead_time": "Ships now",
+        "package": "LQFP-48(7x7)",
+        "temp_range": "-40°C~+85°C",
+        "lifecycle": null,
+        "url": "https://www.lcsc.com/product-detail/C8734.html?s_z=n_q_x_STM32F103C8T6",
+        "read_at": "2026-11-01T08:16:20.503Z",
+        "extra_claims": null
+      },
+      "source": "live"
+    },
+    {
+      "id": "digikey",
+      "name": "DigiKey India",
+      "mode": "agent",
+      "isReference": false,
+      "status": "done",
+      "steps": 13,
+      "note": "done in 13 steps",
+      "startedAt": 1793520909587,
+      "finishedAt": 1793521018222,
+      "runId": "8c120b0d-95e5-431c-8ffd-cb4051b0a9e5",
+      "streamingUrl": "https://ip-54-153-23-232.tetra-data.production.tinyfish.io/tf-bddca6b5-ee2e-4d6a-8b88-7ed429e8ad60/stream/0",
+      "listing": {
+        "seller": "DigiKey India",
+        "seller_type": "authorised",
+        "mpn": null,
+        "stock": 7061,
+        "moq": 1,
+        "price_breaks": [
+          {
+            "qty": 1,
+            "currency": "INR",
+            "unit_price": 790.36
+          },
+          {
+            "qty": 10,
+            "currency": "INR",
+            "unit_price": 608.609
+          },
+          {
+            "qty": 50,
+            "currency": "INR",
+            "unit_price": 535.7546
+          },
+          {
+            "qty": 100,
+            "currency": "INR",
+            "unit_price": 513.1755
+          },
+          {
+            "qty": 250,
+            "currency": "INR",
+            "unit_price": 489.33716
+          },
+          {
+            "qty": 500,
+            "currency": "INR",
+            "unit_price": 474.97364
+          }
+        ],
+        "lead_time": null,
+        "package": "48-LQFP",
+        "temp_range": "-40 C ~ 85 C TA",
+        "lifecycle": "Active",
+        "url": "https://www.digikey.in/en/products/detail/stmicroelectronics/STM32F103C8T6/1646338",
+        "read_at": "2026-11-01T08:16:58.221Z",
+        "extra_claims": null
+      },
+      "source": "live"
+    },
+    {
+      "id": "dna",
+      "name": "DNA Techindia",
+      "mode": "fetch",
+      "isReference": false,
+      "status": "done",
+      "steps": 0,
+      "note": "page read",
+      "startedAt": 1793520909587,
+      "finishedAt": 1793520911598,
+      "runId": null,
+      "streamingUrl": null,
+      "listing": {
+        "seller": "DNA Techindia",
+        "seller_type": "broker",
+        "mpn": "STM32F103C8T6",
+        "stock": 10,
+        "moq": 1,
+        "price_breaks": [
+          {
+            "qty": 1,
+            "unit_price": 143,
+            "currency": "INR"
+          }
+        ],
+        "lead_time": "In stock",
+        "package": null,
+        "temp_range": "-40 to +105 °C",
+        "lifecycle": null,
+        "url": "https://www.dnatechindia.com/stm-32f103c8t6-arm-microcontrollers-mcu.html",
+        "read_at": "2026-11-01T08:15:11.595Z",
+        "extra_claims": "128 KB Flash"
+      },
+      "source": "live"
+    },
+    {
+      "id": "st",
+      "name": "ST eStore",
+      "mode": "fetch",
+      "isReference": true,
+      "status": "done",
+      "steps": 0,
+      "note": "page read",
+      "startedAt": 1793520909588,
+      "finishedAt": 1793520912320,
+      "runId": null,
+      "streamingUrl": null,
+      "listing": {
+        "seller": "ST eStore",
+        "seller_type": "manufacturer_store",
+        "mpn": "STM32F103C8T6",
+        "stock": 0,
+        "moq": null,
+        "price_breaks": [],
+        "lead_time": null,
+        "package": "LQFP 48 7x7x1.4 mm",
+        "temp_range": "-40 to +85 °C",
+        "lifecycle": "Active",
+        "url": "https://estore.st.com/en/stm32f103c8t6-cpn.html",
+        "read_at": "2026-11-01T08:15:12.320Z",
+        "extra_claims": "64 KB Flash"
+      },
+      "source": "live"
+    }
+  ],
+  "status": "done",
+  "rows": [
+    {
+      "seller": "LCSC",
+      "seller_type": "authorised",
+      "mpn": null,
+      "stock": 42120,
+      "moq": 1,
+      "price_breaks": [
+        {
+          "qty": 1,
+          "currency": "USD",
+          "unit_price": 1.5087
+        },
+        {
+          "qty": 10,
+          "currency": "USD",
+          "unit_price": 1.3102
+        },
+        {
+          "qty": 30,
+          "currency": "USD",
+          "unit_price": 1.1696
+        },
+        {
+          "qty": 250,
+          "currency": "USD",
+          "unit_price": 1.0422
+        },
+        {
+          "qty": 500,
+          "currency": "USD",
+          "unit_price": 0.9826
+        },
+        {
+          "qty": 1000,
+          "currency": "USD",
+          "unit_price": 0.9595
+        }
+      ],
+      "lead_time": "Ships now",
+      "package": "LQFP-48(7x7)",
+      "temp_range": "-40°C~+85°C",
+      "lifecycle": null,
+      "url": "https://www.lcsc.com/product-detail/C8734.html?s_z=n_q_x_STM32F103C8T6",
+      "read_at": "2026-11-01T08:16:20.503Z",
+      "extra_claims": null,
+      "source": "live",
+      "verdict": "amber",
+      "reason": "Part number not confirmed on page.",
+      "unit_price_inr": 86.47,
+      "rank": 1
+    },
+    {
+      "seller": "DigiKey India",
+      "seller_type": "authorised",
+      "mpn": null,
+      "stock": 7061,
+      "moq": 1,
+      "price_breaks": [
+        {
+          "qty": 1,
+          "currency": "INR",
+          "unit_price": 790.36
+        },
+        {
+          "qty": 10,
+          "currency": "INR",
+          "unit_price": 608.609
+        },
+        {
+          "qty": 50,
+          "currency": "INR",
+          "unit_price": 535.7546
+        },
+        {
+          "qty": 100,
+          "currency": "INR",
+          "unit_price": 513.1755
+        },
+        {
+          "qty": 250,
+          "currency": "INR",
+          "unit_price": 489.33716
+        },
+        {
+          "qty": 500,
+          "currency": "INR",
+          "unit_price": 474.97364
+        }
+      ],
+      "lead_time": null,
+      "package": "48-LQFP",
+      "temp_range": "-40 C ~ 85 C TA",
+      "lifecycle": "Active",
+      "url": "https://www.digikey.in/en/products/detail/stmicroelectronics/STM32F103C8T6/1646338",
+      "read_at": "2026-11-01T08:16:58.221Z",
+      "extra_claims": null,
+      "source": "live",
+      "verdict": "amber",
+      "reason": "Part number not confirmed on page.",
+      "unit_price_inr": 474.97,
+      "rank": 2
+    },
+    {
+      "seller": "ST eStore",
+      "seller_type": "manufacturer_store",
+      "mpn": "STM32F103C8T6",
+      "stock": 0,
+      "moq": null,
+      "price_breaks": [],
+      "lead_time": null,
+      "package": "LQFP 48 7x7x1.4 mm",
+      "temp_range": "-40 to +85 °C",
+      "lifecycle": "Active",
+      "url": "https://estore.st.com/en/stm32f103c8t6-cpn.html",
+      "read_at": "2026-11-01T08:15:12.320Z",
+      "extra_claims": "64 KB Flash",
+      "source": "live",
+      "verdict": "amber",
+      "reason": "The item is currently out of stock.",
+      "unit_price_inr": null,
+      "rank": 3
+    },
+    {
+      "seller": "DNA Techindia",
+      "seller_type": "broker",
+      "mpn": "STM32F103C8T6",
+      "stock": 10,
+      "moq": 1,
+      "price_breaks": [
+        {
+          "qty": 1,
+          "unit_price": 143,
+          "currency": "INR"
+        }
+      ],
+      "lead_time": "In stock",
+      "package": null,
+      "temp_range": "-40 to +105 °C",
+      "lifecycle": null,
+      "url": "https://www.dnatechindia.com/stm-32f103c8t6-arm-microcontrollers-mcu.html",
+      "read_at": "2026-11-01T08:15:11.595Z",
+      "extra_claims": "128 KB Flash",
+      "source": "live",
+      "verdict": "red",
+      "reason": "Temperature range mismatch, flash claim mismatch, missing package, insufficient stock.",
+      "unit_price_inr": 143,
+      "rank": 4
+    }
+  ],
+  "reference": {
+    "seller": "ST eStore",
+    "seller_type": "manufacturer_store",
+    "mpn": "STM32F103C8T6",
+    "stock": 0,
+    "moq": null,
+    "price_breaks": [],
+    "lead_time": null,
+    "package": "LQFP 48 7x7x1.4 mm",
+    "temp_range": "-40 to +85 °C",
+    "lifecycle": "Active",
+    "url": "https://estore.st.com/en/stm32f103c8t6-cpn.html",
+    "read_at": "2026-11-01T08:15:12.320Z",
+    "extra_claims": "64 KB Flash"
+  },
+  "verifier": "Gemini + rules",
+  "fxNote": "USD→INR at 88 (fixed rate). Prices ex-GST."
+}

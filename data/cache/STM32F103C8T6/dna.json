@@ -1,0 +1,21 @@
+{
+  "seller": "DNA Techindia",
+  "seller_type": "broker",
+  "mpn": "STM32F103C8T6",
+  "stock": 10,
+  "moq": 1,
+  "price_breaks": [
+    {
+      "qty": 1,
+      "unit_price": 143,
+      "currency": "INR"
+    }
+  ],
+  "lead_time": "In stock",
+  "package": null,
+  "temp_range": "-40 to +105 °C",
+  "lifecycle": null,
+  "url": "https://www.dnatechindia.com/stm-32f103c8t6-arm-microcontrollers-mcu.html",
+  "read_at": "2026-11-01T08:15:11.595Z",
+  "extra_claims": "128 KB Flash"
+}

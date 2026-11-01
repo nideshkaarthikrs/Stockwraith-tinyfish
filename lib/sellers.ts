@@ -58,9 +58,12 @@ export function agentGoal(mpn: string): string {
   return [
     `Search this site for the exact electronic part number "${mpn}".`,
     `Open the product detail page for exactly ${mpn} (not a different suffix or variant).`,
-    `From that page read: manufacturer part number, quantity in stock, minimum order quantity,`,
-    `every price break (quantity, unit price, currency), lead time, package/case,`,
-    `operating temperature range, and lifecycle/part status. Also return the product page URL.`,
+    `From that page fill these fields:`,
+    `mpn = the manufacturer part number exactly as printed on the product page (e.g. "${mpn}");`,
+    `stock = quantity in stock as a number; moq = minimum order quantity;`,
+    `price_breaks = every quantity price break (qty, unit_price, currency code like USD or INR);`,
+    `lead_time; package = package/case; temp_range = operating temperature range;`,
+    `lifecycle = part/lifecycle status (e.g. Active, NRND, Obsolete); url = the product page URL.`,
     `Use null for any field not shown on the page. Never guess or estimate values.`,
     `Do not log in, create an account or add anything to the cart.`,
   ].join(" ");

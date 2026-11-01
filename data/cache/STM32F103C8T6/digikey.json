@@ -1,0 +1,46 @@
+{
+  "seller": "DigiKey India",
+  "seller_type": "authorised",
+  "mpn": null,
+  "stock": 7061,
+  "moq": 1,
+  "price_breaks": [
+    {
+      "qty": 1,
+      "currency": "INR",
+      "unit_price": 790.36
+    },
+    {
+      "qty": 10,
+      "currency": "INR",
+      "unit_price": 608.609
+    },
+    {
+      "qty": 50,
+      "currency": "INR",
+      "unit_price": 535.7546
+    },
+    {
+      "qty": 100,
+      "currency": "INR",
+      "unit_price": 513.1755
+    },
+    {
+      "qty": 250,
+      "currency": "INR",
+      "unit_price": 489.33716
+    },
+    {
+      "qty": 500,
+      "currency": "INR",
+      "unit_price": 474.97364
+    }
+  ],
+  "lead_time": null,
+  "package": "48-LQFP",
+  "temp_range": "-40 C ~ 85 C TA",
+  "lifecycle": "Active",
+  "url": "https://www.digikey.in/en/products/detail/stmicroelectronics/STM32F103C8T6/1646338",
+  "read_at": "2026-11-01T08:16:58.221Z",
+  "extra_claims": null
+}

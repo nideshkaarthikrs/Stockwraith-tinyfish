@@ -30,6 +30,7 @@ export interface Run {
   result: Record<string, unknown> | null;
   error: unknown;
   streaming_url: string | null;
+  steps?: { action?: string; status?: string; timestamp?: string }[];
 }
 
 export async function startRun(url: string, goal: string, outputSchema?: object): Promise<string> {
